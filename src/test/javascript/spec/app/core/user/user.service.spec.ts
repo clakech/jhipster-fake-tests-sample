@@ -32,9 +32,24 @@ describe('Service Tests', () => {
                 const resourceUrl = SERVER_API_URL + 'api/users';
                 expect(req.request.url).toEqual(`${resourceUrl}/user`);
             });
-            it('should return User', () => {
-                service.find('user').subscribe(received => {
-                    expect(received.body.login).toEqual('sdfdsf');
+            it('should return User OK', done => {
+                service.find('user').subscribe({
+                    next: received => {
+                        expect(received.body.login).toEqual('user');
+                    },
+                    complete: () => done()
+                });
+
+                const req = httpMock.expectOne({ method: 'GET' });
+                req.flush(new User(1, 'user'));
+            });
+
+            it('should return User KO', done => {
+                service.find('user').subscribe({
+                    next: received => {
+                        expect(received.body.login).toEqual('NOT A USER');
+                    },
+                    complete: () => done()
                 });
 
                 const req = httpMock.expectOne({ method: 'GET' });
